@@ -3,6 +3,7 @@ from datetime import datetime, timezone
 from time import perf_counter
 from app.manifest import manifest
 from app.pipeline import execute
+from app.modules.release.service import ensure
 from .repository import fetch, persist
 
 
@@ -14,7 +15,12 @@ def run(source,book):
     proof.update(elapsed_ms=round((perf_counter()-started)*1000,2),created=created)
     result['manifest'] = proof
     stored = persist(proof['run_id'],source,book,result,created)
-    return json.loads(stored['result'])
+    stored_result = json.loads(stored['result'])
+    # Publish the per-segment conclusion with the batch.  Running the same
+    # bytes under the same rule version reuses the published version, and a
+    # failed write leaves the previous conclusion current.
+    ensure(proof['run_id'],stored_result)
+    return stored_result
 
 
 def replay(run_id):

@@ -110,6 +110,16 @@ async function render() {
     } else if (stage === 'quality') {
       view = [key, line, ['判定', row => tag(row.code)], ['说明', 'detail'], ['字段', raw]];
       rows = [...result.quarantine, ...result.suppressed].sort((a,b) => a.line-b.line);
+    } else if (stage === 'release') {
+      const release = await query(`/api/release/${id}`);
+      const state = row => el('span', row.outcome, row.outcome === '放行' ? 'state' : 'state problem');
+      view = [key, line, ['结论', state], ['依据', 'basis'],
+              ['校准时长 · ' + settings.unit, 'amount', 'num'],
+              ['判定', row => row.code ? tag(row.code) : '—'], ['说明', 'detail']];
+      rows = release.segments;
+      if (ticket === renderEpoch) {
+        notice(`放行 ${release.summary.released} 段 · 隔离 ${release.summary.held} 段 · 结论版本 ${release.version}`);
+      }
     } else if (stage === 'reconcile') {
       view = [key, ['实际', 'amount', 'num'], ['外部账', 'reference', 'num'], ['差值', 'delta', 'num'], ['外部行', 'book_line', 'num'], ['结论', row => tag(row.code)]];
       rows = [...result.book.rows].sort((a,b) => Number(a.code === 'MATCH') - Number(b.code === 'MATCH'));

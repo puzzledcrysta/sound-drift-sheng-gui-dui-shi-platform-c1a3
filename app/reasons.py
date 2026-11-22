@@ -11,4 +11,4 @@ REASONS = {
     'REVIEW_NOTE': '有差异时须填写复核意见', 'REVIEW_DECISION': '复核结论无效',
 }
 
-REASONS.update({'SOUND_ANCHOR': '锚点无效', 'SOUND_COVERAGE': '片段超出覆盖', 'SOUND_REWIND': '参考时钟回退', 'SOUND_PPM': '漂移超限', 'DATE': '日期格式无效', 'REV_BLOCKED': '较新来源尚未采信'})
+REASONS.update({'SOUND_ANCHOR': '锚点无效', 'SOUND_COVERAGE': '片段超出覆盖', 'SOUND_REWIND': '参考时钟回退', 'SOUND_PPM': '漂移超限', 'SOUND_WRAP': '跨日记录无法采信', 'DATE': '日期格式无效', 'REV_BLOCKED': '较新来源尚未采信'})

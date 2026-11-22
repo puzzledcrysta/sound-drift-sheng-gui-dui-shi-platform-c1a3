@@ -14,7 +14,8 @@
 | M4 双锚校时 | 按规则复算并追溯证据 | `POST /api/domain` | `app/modules/domain/rule.py` | `tests/test_domain.py` |
 | M5 制作勾稽 | 核对独立清单和各类差异 | `POST /api/reconcile` | `app/modules/reconcile/service.py` | `tests/test_reconcile.py` |
 | M6 片段批次 | 打开历史批次并对原文件复跑 | `POST /api/runs` | `app/modules/runs/service.py` | `tests/test_runs.py` |
-| M7 校时复核 | 登记复核结论并下载证据 | `POST /api/review/{run_id}` | `app/modules/review/decisions.py` | `tests/test_review.py` |
+| M7 放行结论 | 按片段形成可复核的放行结论 | `GET/POST /api/release/{run_id}` | `app/modules/release/service.py` | `tests/test_release.py` |
+| M8 校时复核 | 登记复核结论并下载证据 | `POST /api/review/{run_id}` | `app/modules/review/decisions.py` | `tests/test_review.py` |
 
 ## 陷阱登记
 
@@ -35,7 +36,16 @@
 | TRAP-26 | 陈旧复核版本拒绝 | 测试构造 | `app/modules/review/decisions.py` | `tests/test_review.py::test_stale` |
 | TRAP-09 | large index | cases.csv | `app/modules/domain/rule.py` | `tests/test_domain.py::test_large_index` |
 | TRAP-108 | rewound | cases.csv | `app/modules/domain/rule.py` | `tests/test_domain.py::test_rewound` |
+| TRAP-109 | 零点归零被当作故障 | cases.csv | `app/modules/domain/rule.py` | `tests/test_crossday.py::test_cross_day_sample_proves_rollover` |
+| TRAP-110 | 无旁证回退混入放行 | cases.csv | `app/modules/domain/rule.py` | `tests/test_crossday.py::test_unproven_rewind_stays_quarantined` |
+| TRAP-111 | 跨日旁证与回退错位 | cases.csv | `app/modules/domain/rule.py` | `tests/test_crossday.py::test_cross_day_mismatch` |
+| TRAP-112 | 重跑新增放行结论 | 测试构造 | `app/modules/release/service.py` | `tests/test_release.py::test_rerun_does_not_add_conclusion` |
+| TRAP-113 | 放行写入失败未回退旧版 | 测试构造 | `app/modules/release/service.py` | `tests/test_release.py::test_failed_write_keeps_old_conclusion` |
 
 ## 对账
 
 输入 = 计入 + 隔离 + 重传及版本替换 + 空白记录 + 重复表头。按业务键全外连接，缺失一侧与数值为零分别登记。逐笔差值与总差一致。
+
+## 放行
+
+按片段逐条判定：已采信片段放行出证，无旁证的钟面回退单独隔离，其余片段不随之扣住。同一批重跑得到同一结论，不新增版本；写入失败时保留上一版结论并整体回滚。

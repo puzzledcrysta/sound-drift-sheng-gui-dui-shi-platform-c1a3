@@ -1,6 +1,6 @@
 from app.errors import DataError
 from app.evidence import finding
-from app.settings import KEY, FIELDS
+from app.settings import KEY, FIELDS, OPTIONAL_FIELDS
 from app.modules.domain.values import whole, instant
 from .schema import mapping, REQUIRED, MISSING
 
@@ -26,5 +26,6 @@ def normalize(source):
             continue
         passed.append({'key':key,'revision':revision,'time':changed,'line':record['line'],
                        'raw':record['raw'],'fields':{field:values[field] for field in FIELDS},
+                       'optional':{field:values.get(field,'') for field in OPTIONAL_FIELDS if field in values},
                        'note':values.get('原始备注','')})
     return passed, rejected

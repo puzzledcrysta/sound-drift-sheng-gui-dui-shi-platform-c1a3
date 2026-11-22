@@ -8,7 +8,7 @@ def calculate(records):
     accepted, rejected = [],[]
     for record in records:
         try:
-            amount, proof = evaluate(record['fields'])
+            amount, proof = evaluate({**record['fields'], **record.get('optional',{})})
         except DataError as error:
             rejected.append(finding(record,error.code,str(error)))
             continue
